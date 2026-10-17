@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Génesis</title>
+  <style>
+    body {
+  background: #111;
+  color: #eee;
+  font-family: Georgia, serif;
+  text-align: center;
+  padding: 40px 20px;
+}
+#contenedor {
+  max-width: 700px;
+  margin: 0 auto;
+}
+    .verso {
+      font-size: 1.5rem;
+      margin: 20px;
+      cursor: pointer;
+      transition: all 0.6s;
+    }
+    .verso.activo {
+      color: #ff6b9d;
+      letter-spacing: 6px;
+      transform: scale(1.1);
+    }
+    button {
+  background: transparent;
+  color: #ff6b9d;
+  border: 1px solid #ff6b9d;
+  padding: 12px 28px;
+  margin: 10px;
+  font-family: Georgia, serif;
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.4s;
+}
+  #titulo {
+  color: #fff;
+  font-size: 2.5rem;
+  letter-spacing: 8px;
+  text-shadow: 0 0 10px #fff, 0 0 25px #fff;
+  transition: all 2s;
+  }
+  #estrellas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  }
+button:hover,
+button:active {
+  background: #ff6b9d;
+  color: #111;
+  box-shadow: 0 0 20px #ff6b9d;
+}
+    #final {
+  opacity: 0;
+  transition: opacity 2s;
+}
+#final.activo {
+  opacity: 1;
+}
+    
+body {
+  transition: background 2s;
+  min-height: 100vh;
+}
+  </style>
+</head>
+<body>
+  <canvas id="estrellas"></canvas>
+  <div id="contenedor">
+  <h1 id="titulo">Génesis</h1>
+  <div class="verso" data-alt="Y tú, mi pecado favorito">Sos el génesis de mi infierno</div>
+  <div class="verso" data-alt="No importa tus labios son mi edén" >Probé tu sidra y ahora hace estragos con mi manzana</div>
+  <div class="verso" data-alt="No sé si sos un falso profeta o mi salvación al apocalipsís.">Toca cada línea y mira qué pasa</div>
+  <div id="opciones">
+  <button onclick="elegir('perdonar')">Perdonar</button>
+  <button onclick="elegir('olvidar')">Olvidar</button>
+  <button onclick="reiniciar()">Volver a empezar</button>
+</div>
+<div class="verso" id="final"></div>
+  </div>
+
+  <script>
+   const versos = document.querySelectorAll('.verso');
+
+versos.forEach(v => {
+  const original = v.textContent;
+  v.dataset.original = original;
+  v.addEventListener('click', () => {
+    v.classList.toggle('activo');
+    if (v.classList.contains('activo')) {
+      v.textContent = v.dataset.alt || original;
+    } else {
+      v.textContent = original;
+    }
+  });
+});
+let escribiendo;
+const canvas = document.getElementById('estrellas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const estrellas = [];
+for (let i = 0; i < 80; i++) {
+  estrellas.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2 + 0.5,
+    v: Math.random() * 0.4 + 0.1
+  });
+}
+
+function animar() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+  estrellas.forEach(e => {
+    e.y -= e.v;
+    if (e.y < 0) e.y = canvas.height;
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  requestAnimationFrame(animar);
+}
+animar();
+function escribir(elemento, texto) {
+  clearInterval(escribiendo);
+  elemento.textContent = '';
+  let i = 0;
+  escribiendo = setInterval(() => {
+    elemento.textContent += texto[i];
+    i++;
+    if (i >= texto.length) clearInterval(escribiendo);
+  }, 70);
+    }
+function elegir(camino) {
+  const final = document.getElementById('final');
+  const titulo = document.getElementById('titulo');
+  if (camino === 'perdonar') {
+    escribir(final, 'Entonces que mi caída sea tu bautismo');
+    document.body.style.background = 'linear-gradient(#0a2a4a, #111)';
+    titulo.style.color = '#7fd1ff';
+    titulo.style.textShadow = '0 0 10px #7fd1ff, 0 0 25px #7fd1ff';
+  } else {
+    escribir(final, 'Entonces que el olvido sea mi último pecado');
+    document.body.style.background = 'linear-gradient(#4a0010, #111)';
+    titulo.style.color = '#ff4d6d';
+    titulo.style.textShadow = '0 0 10px #ff4d6d, 0 0 25px #ff4d6d';
+  }
+  final.classList.add('activo');
+}
+  function reiniciar() {
+    clearInterval(escribiendo);
+    const titulo = document.getElementById('titulo');
+    const final = document.getElementById('final');
+titulo.style.color = '#fff';
+titulo.style.textShadow = '0 0 10px #fff, 0 0 25px #fff';
+    final.classList.remove('activo');
+    final.textContent = '';
+    document.body.style.background = '#111';
+    versos.forEach(v => {
+      v.classList.remove('activo');
+      if (v.dataset.original !== undefined) {
+        v.textContent = v.dataset.original;
+      }
+    });
+  }
+    window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+  </script>
+</body>
+</html>
